@@ -1,15 +1,13 @@
 import React from 'react';
-import {
-  Button,
-  CircularProgress,
-  Container,
-} from '@material-ui/core';
+import { CircularProgress, Grid } from '@material-ui/core';
 import { ConnectForm, ConnectFormPayload } from './ConnectForm';
 import { Controller } from './Controller';
 import * as settings from './settings';
 import { Client } from './Client';
+import { useStyles } from './style';
 
 export const App = () => {
+  const classes = useStyles();
   const [client, setClient] = React.useState<Client | null>(null);
   const [isConnected, setConnected] = React.useState(false);
   const handleSubmit = ({
@@ -30,21 +28,29 @@ export const App = () => {
     setClient(client);
   };
   return (
-    <Container maxWidth="sm">
+    <Grid
+      className={classes.root}
+      direction="row"
+      alignItems="center"
+      justify="center"
+      container
+    >
       {client ? (
         isConnected ? (
-          <>
-            <Controller onChange={(v) => client?.setPulse(v)} />
-            <Button onClick={() => client.disconnect()}>
-              Disconnect
-            </Button>
-          </>
+          <Grid item xs={11} sm={8}>
+            <Controller
+              onChange={(v) => client?.setPulse(v)}
+              onDisconnect={() => client.disconnect()}
+            />
+          </Grid>
         ) : (
           <CircularProgress />
         )
       ) : (
-        <ConnectForm onSubmit={handleSubmit} />
+        <Grid item xs={11} sm={8}>
+          <ConnectForm onSubmit={handleSubmit} />
+        </Grid>
       )}
-    </Container>
+    </Grid>
   );
 };

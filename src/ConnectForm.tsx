@@ -1,4 +1,4 @@
-import { Button, TextField } from '@material-ui/core';
+import { Button, Grid, TextField } from '@material-ui/core';
 import React from 'react';
 import { getAccessToken, getDeviceId } from './settings';
 
@@ -23,30 +23,45 @@ export const ConnectForm = ({ onSubmit }: Props) => {
       });
   };
   return (
-    <form
-      onSubmit={(e) => {
+    <Grid
+      container
+      spacing={2}
+      direction="column"
+      component="form"
+      onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         handleSubmit();
       }}
     >
-      <TextField
-        label="Device ID"
-        placeholder="XXXX-XXXX"
-        required
-        fullWidth
-        value={deviceId || ''}
-        onChange={(e) => setDeviceId(e.target.value)}
-      />
-      <TextField
-        label="Access Token"
-        placeholder=""
-        fullWidth
-        value={accessToken || ''}
-        onChange={(e) => setAccessToken(e.target.value)}
-      />
-      <Button type="submit" fullWidth>
-        Connect
-      </Button>
-    </form>
+      <Grid item lg>
+        <TextField
+          label="Device ID"
+          placeholder="XXXX-XXXX"
+          required
+          fullWidth
+          value={deviceId || ''}
+          onChange={(e) => setDeviceId(e.target.value)}
+        />
+      </Grid>
+      <Grid item lg>
+        <TextField
+          label="Access Token"
+          placeholder=""
+          fullWidth
+          value={accessToken || ''}
+          onChange={(e) => setAccessToken(e.target.value)}
+        />
+      </Grid>
+      <Grid item lg>
+        <Button
+          type="submit"
+          fullWidth
+          color="primary"
+          variant="contained"
+        >
+          Connect
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
