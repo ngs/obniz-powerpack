@@ -39,7 +39,7 @@ export const App = () => {
         isConnected ? (
           <Grid item xs={11} sm={8}>
             <Controller
-              onChange={(v) => client?.setPulse(v)}
+              onChange={(v) => client?.setDuty(v)}
               onDisconnect={() => client.disconnect()}
             />
           </Grid>

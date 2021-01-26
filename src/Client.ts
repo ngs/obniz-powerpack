@@ -4,7 +4,7 @@ export class Client {
   onOpen?: () => void;
   onClose?: () => void;
   private socket: WebSocket | null = null;
-  private freq: number = 20;
+  private freq: number = 255;
   private pulse: number = 0;
   constructor(deviceId: string, accessToken: string | null = null) {
     this.deviceId = deviceId;
@@ -28,7 +28,7 @@ export class Client {
       this.socket = new WebSocket(`${redirect}/${this.path}`);
       this.socket.onopen = () => {
         this.onOpen && this.onOpen();
-        this.setPwm();
+        this.setup();
       };
       this.socket.onclose = () => {
         this.onClose && this.onClose();
@@ -43,10 +43,15 @@ export class Client {
     if (!this.socket) return;
     this.socket.send(JSON.stringify(data));
   }
-  setPwm() {
+  setup() {
     this.send({
+      io0: false,
       pwm0: {
-        io: 0,
+        io: 4,
+        freq: this.freq,
+      },
+      pwm1: {
+        io: 5,
         freq: this.freq,
       },
     });
@@ -60,11 +65,25 @@ export class Client {
       },
     });
   }
+  setDuty(duty: number) {
+    this.setPulse((1 / this.freq) * 1000 * duty * 0.01);
+  }
   setPulse(pulse: number) {
     this.pulse = pulse;
-    this.send({
-      pwm0: { pulse },
-    });
+    if (pulse > 0) {
+      this.send({
+        pwm0: { pulse },
+      });
+    } else if (pulse < 0) {
+      this.send({
+        pwm1: { pulse: pulse * -1 },
+      });
+    } else {
+      this.send({
+        pwm0: { pulse: 0 },
+        pwm1: { pulse: 0 },
+      });
+    }
     this.updateDisplay();
   }
   setFreq(freq: number) {
