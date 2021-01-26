@@ -1,15 +1,26 @@
-import { Button, Input } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import React from 'react';
-import { getDeviceId } from './settings';
+import { getAccessToken, getDeviceId } from './settings';
+
+export interface ConnectFormPayload {
+  deviceId: string;
+  accessToken: string | null;
+}
 
 interface Props {
-  onSubmit: (value: string) => void;
+  onSubmit: (value: ConnectFormPayload) => void;
 }
 export const ConnectForm = ({ onSubmit }: Props) => {
-  const [value, setValue] = React.useState(getDeviceId());
+  const [deviceId, setDeviceId] = React.useState(getDeviceId());
+  const [accessToken, setAccessToken] = React.useState(
+    getAccessToken(),
+  );
   const handleSubmit = () => {
-    value && onSubmit(value);
-    return;
+    deviceId &&
+      onSubmit({
+        deviceId,
+        accessToken,
+      });
   };
   return (
     <form
@@ -18,11 +29,24 @@ export const ConnectForm = ({ onSubmit }: Props) => {
         handleSubmit();
       }}
     >
-      <Input
-        value={value || ''}
-        onChange={(e) => setValue(e.target.value)}
+      <TextField
+        label="Device ID"
+        placeholder="XXXX-XXXX"
+        required
+        fullWidth
+        value={deviceId || ''}
+        onChange={(e) => setDeviceId(e.target.value)}
       />
-      <Button type="submit">Connect</Button>
+      <TextField
+        label="Access Token"
+        placeholder=""
+        fullWidth
+        value={accessToken || ''}
+        onChange={(e) => setAccessToken(e.target.value)}
+      />
+      <Button type="submit" fullWidth>
+        Connect
+      </Button>
     </form>
   );
 };

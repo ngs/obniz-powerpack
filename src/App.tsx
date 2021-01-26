@@ -1,32 +1,44 @@
 import React from 'react';
-import { CircularProgress, Container } from '@material-ui/core';
-import { ConnectForm } from './ConnectForm';
+import {
+  Button,
+  CircularProgress,
+  Container,
+} from '@material-ui/core';
+import { ConnectForm, ConnectFormPayload } from './ConnectForm';
 import { Controller } from './Controller';
 import * as settings from './settings';
-import { Client } from './client';
+import { Client } from './Client';
 
 export const App = () => {
-  const [deviceId, setDeviceId] = React.useState('');
   const [client, setClient] = React.useState<Client | null>(null);
   const [isConnected, setConnected] = React.useState(false);
-  const handleSubmit = (value: string) => {
-    setDeviceId(value);
-    settings.setDeviceId(value);
-    const client = new Client(value);
+  const handleSubmit = ({
+    accessToken,
+    deviceId,
+  }: ConnectFormPayload) => {
+    settings.setDeviceId(deviceId);
+    settings.setAccessToken(accessToken);
+    const client = new Client(deviceId, accessToken);
     client.onOpen = () => {
       setConnected(true);
+    };
+    client.onClose = () => {
+      setClient(null);
+      setConnected(false);
     };
     client.connect();
     setClient(client);
   };
   return (
     <Container maxWidth="sm">
-      {deviceId ? (
+      {client ? (
         isConnected ? (
-          <Controller
-            deviceId={deviceId}
-            onChange={(v) => client?.setPulse(v)}
-          />
+          <>
+            <Controller onChange={(v) => client?.setPulse(v)} />
+            <Button onClick={() => client.disconnect()}>
+              Disconnect
+            </Button>
+          </>
         ) : (
           <CircularProgress />
         )

@@ -1,14 +1,22 @@
 export class Client {
   deviceId: string;
+  accessToken: string | null;
   onOpen?: () => void;
+  onClose?: () => void;
   private socket: WebSocket | null = null;
   private freq: number = 20;
   private pulse: number = 0;
-  constructor(deviceId: string) {
+  constructor(deviceId: string, accessToken: string | null = null) {
     this.deviceId = deviceId;
+    this.accessToken = accessToken;
   }
   get path(): string {
-    return `obniz/${this.deviceId}/ws/1`;
+    return `obniz/${this.deviceId}/ws/1${
+      this.accessToken ? `?access_token=${this.accessToken}` : ''
+    }`;
+  }
+  disconnect() {
+    this.socket?.close();
   }
   connect() {
     this.socket = new WebSocket(`wss://obniz.com/${this.path}`);
@@ -21,6 +29,10 @@ export class Client {
       this.socket.onopen = () => {
         this.onOpen && this.onOpen();
         this.setPwm();
+      };
+      this.socket.onclose = () => {
+        this.onClose && this.onClose();
+        this.socket = null;
       };
       window.onunload = () => {
         this.socket?.close();

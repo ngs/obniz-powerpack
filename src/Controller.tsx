@@ -2,13 +2,11 @@ import React from 'react';
 import { Box, Slider } from '@material-ui/core';
 
 interface Props {
-  deviceId: string;
   onChange: (value: number) => void;
 }
 
-export const Controller = ({ deviceId, onChange }: Props) => {
+export const Controller = ({ onChange }: Props) => {
   const [value, setValue] = React.useState(0);
-  if (!deviceId) return null;
   return (
     <Box>
       <Slider
